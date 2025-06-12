@@ -1,0 +1,17 @@
+newmtl Wolf
+    Ns 10.000000
+    Ni 1.500000
+    d 1.000000
+    Tr 0.000000
+    Tf 1.000000 1.000000 1.000000 
+    illum 2
+    Ka 0.588000 0.588000 0.588000
+    Kd 0.588000 0.588000 0.588000
+    # map_Kd Wolf_Roughness.jpg
+	# map_Kd Wolf_Base_color.jpg
+	# map_Kd Wolf_Metallic.jpg
+	# map_Kd Wolf_Opacity.jpg
+	# map_Kd Wolf_Height.jpg
+
+    Ks 0.000000 0.000000 0.000000
+    Ke 0.000000 0.000000 0.000000

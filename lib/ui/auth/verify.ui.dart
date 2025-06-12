@@ -1,0 +1,100 @@
+import 'package:ecom_one/animations/rotator.dart';
+import 'package:ecom_one/controllers/auth/verify.controller.dart';
+import 'package:ecom_one/utils/otp.field.dart';
+import 'package:ecom_one/utils/widgets.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+class VerifyUserActivity extends StatelessWidget {
+  final String email;
+  VerifyUserActivity({super.key, this.email = ''});
+  static const routeName = '/verify';
+
+  final GlobalKey<RotatorState> verifyRotatorKey = GlobalKey<RotatorState>();
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = Get.put(VerifyController());
+    return Scaffold(
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: MediaQuery.of(context).size.height,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(40.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    screenHeading('verify', 'OTP', MainAxisAlignment.center),
+                    SizedBox(height: 30),
+                    OtpInput(
+                      onCompleted: (code) async {
+                        verifyRotatorKey.currentState?.toggleRotate();
+
+                        final success = await controller.verifyOtp(
+                          context: context,
+                          email: email,
+                          otp: code,
+                        );
+
+                        if (!success) {
+                          verifyRotatorKey.currentState?.toggleRotate();
+                        }
+                      },
+                    ),
+
+                    SizedBox(height: 30),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        darkLightButton('BACK', () {
+                          verifyRotatorKey.currentState?.toggleRotate();
+                          controller.navigateSignup(context);
+                        }),
+                        SizedBox(width: 15),
+                        Rotator(key: verifyRotatorKey),
+                        SizedBox(width: 15),
+                        Obx(() {
+                          if (controller.isTimerOn.value) {
+                            return ekdhamDarkTimerButton(
+                              '00:${controller.secondsRemaining.value}',
+                            );
+                          } else {
+                            return ekdhamDarkYellowButton('RESEND', () async {
+                              controller.startResendTimer();
+                              await controller.resendOtp(
+                                context: context,
+                                email: email,
+                              );
+                            });
+                          }
+                        }),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 10,
+            child: Padding(
+              padding: const EdgeInsets.all(40.0),
+              child: darkLightVendorButton('Didn\'t recieved OTP?', () {
+                //controller.navigateVendor(context);
+                verifyRotatorKey.currentState?.toggleRotate();
+              }, Icons.keyboard_arrow_down_rounded),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
