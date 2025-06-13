@@ -103,7 +103,12 @@ class DashboardActivity extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final mdqry = MediaQuery.of(context);
+    final screenHt = mdqry.size.height;
+    final screenWt = mdqry.size.width;
+
     return Scaffold(
+      extendBody: true,
       body: NotificationListener<ScrollNotification>(
         onNotification: (notif) {
           if (notif is ScrollUpdateNotification) {
@@ -113,6 +118,7 @@ class DashboardActivity extends StatelessWidget {
         },
         child: Stack(
           children: [
+            
             PageView(
               controller: controller.pageController,
               onPageChanged: controller.onPageChanged,
@@ -144,22 +150,23 @@ class DashboardActivity extends StatelessWidget {
                 ),
               ),
             ),
+            
             Positioned(
-              left: 40,
-              right: 40,
-              bottom: 40,
+              left: screenWt * 0.05,
+              right: screenWt * 0.05,
+              bottom: screenHt * 0.03,
               child: Obx(
                 () => ClipRRect(
                   borderRadius: BorderRadius.circular(25),
                   child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                    filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
                     child: Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 16,
                         vertical: 8,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.black.withAlpha((0.25 * 255).round()),
+                        color: Colors.white.withAlpha((0.1 * 255).round()),
                         borderRadius: BorderRadius.circular(25),
                       ),
                       child: Row(
@@ -189,7 +196,7 @@ class DashboardActivity extends StatelessWidget {
               top: 0,
               left: 0,
               right: 0,
-              height: 200,
+              height: 100,
               child: ClipRect(
                 child: ShaderMask(
                   blendMode: BlendMode.dstIn,
@@ -210,10 +217,10 @@ class DashboardActivity extends StatelessWidget {
                 ),
               ),
             ),
-
+    
             Positioned(
               left: 20,
-              top: 60,
+              top: screenHt * 0.07,
               child: Obx(() {
                 return AnimatedOpacity(
                   opacity: controller.isScrollingDown.value ? 1.0 : 0.0,
@@ -311,7 +318,7 @@ class DashboardActivity extends StatelessWidget {
               }),
             ),
             Positioned(
-              top: 60,
+              top: screenHt * 0.07,
               right: 20,
               child: Column(
                 children: [
@@ -322,25 +329,25 @@ class DashboardActivity extends StatelessWidget {
                       children: [
                         ekdhamDarkIconRadioButton(
                           Icons.accessibility_new_rounded,
-                          'sample',
+                          'todo',
                           () {},
                         ),
                         SizedBox(height: 10),
                         ekdhamDarkIconRadioButton(
                           Icons.accessibility_new_rounded,
-                          'sample',
+                          'todo',
                           () {},
                         ),
                         SizedBox(height: 10),
                         ekdhamDarkIconRadioButton(
                           Icons.accessibility_new_rounded,
-                          'sample',
+                          'todo',
                           () {},
                         ),
                         SizedBox(height: 10),
                         ekdhamDarkIconRadioButton(
                           Icons.accessibility_new_rounded,
-                          'sample',
+                          'todo',
                           () {},
                         ),
                       ],
@@ -350,6 +357,7 @@ class DashboardActivity extends StatelessWidget {
                 ],
               ),
             ),
+            
           ],
         ),
       ),

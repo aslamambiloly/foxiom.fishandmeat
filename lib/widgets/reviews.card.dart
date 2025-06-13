@@ -26,7 +26,7 @@ class ReviewCard extends StatelessWidget {
               starOpacity(review['rating'], 16),
               SizedBox(width: 3),
               Text(
-                '${review['rating']} ',
+                '${(review['rating'] as num).toDouble().toStringAsFixed(1)} ',
                 style: TextStyle(
                   color: Colors.white,
                   fontFamily: 'Sora-SemiBold',

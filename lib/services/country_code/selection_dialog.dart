@@ -46,6 +46,7 @@ class _SelectionDialogState extends State<SelectionDialog> {
             hintText: "Search Country",
             hintStyle: TextStyle(fontFamily: 'Sora', fontSize: 12),
             border: InputBorder.none,
+            fillColor: Colors.grey[800]
           ),
           onChanged: _filterElements,
         ),
@@ -92,36 +93,33 @@ class _SelectionDialogState extends State<SelectionDialog> {
   );
 
   Widget _buildOption(CountryCode e) {
-    return SizedBox(
-      width: 400,
-      child: Flex(
-        direction: Axis.horizontal,
-        children: <Widget>[
-          widget.showFlag!
-              ? Flexible(
-                child: Padding(
-                  padding: EdgeInsets.only(right: 16.0),
-                  child: CountryFlag.fromCountryCode(
-                    e.code!.toUpperCase(),
-                    height: 25.0,
-                    width: 25.0,
-                    shape: const RoundedRectangle(8),
-                  ),
+    return Flex(
+      direction: Axis.horizontal,
+      children: <Widget>[
+        widget.showFlag!
+            ? Flexible(
+              child: Padding(
+                padding: EdgeInsets.only(right: 16.0),
+                child: CountryFlag.fromCountryCode(
+                  e.code!.toUpperCase(),
+                  height: 25.0,
+                  width: 25.0,
+                  shape: const RoundedRectangle(8),
                 ),
-              )
-              : Container(),
-          Expanded(
-            flex: 4,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Expanded(child: Text(e.toLongString())),
-                Text(e.dialCode!),
-              ],
-            ),
+              ),
+            )
+            : Container(),
+        Expanded(
+          flex: 4,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Expanded(child: Text(e.toLongString())),
+              Text(e.dialCode!),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 

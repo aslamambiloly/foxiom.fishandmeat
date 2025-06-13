@@ -151,7 +151,9 @@ class ProductCard extends StatelessWidget {
                                       ),
                                     ],
                                   ),
-                                  children: [TextSpan(text: '$rating')],
+                                  children: [
+                                    TextSpan(text: rating.toStringAsFixed(1)),
+                                  ],
                                 ),
                               ),
                             ],

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 
@@ -33,48 +34,65 @@ class AnimatedSearchBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final ctrl = Get.put(AnimatedSearchBarController());
 
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      child: Material(
-        borderRadius: BorderRadius.circular(20),
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(20),
-          onTap: ctrl.toggle,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(30.0, 12.0, 30.0, 12.0),
-            child: Obx(() {
-              final expanded = ctrl.isAnimated.value;
-              final show = ctrl.showContent.value;
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+        child: Card(
+          elevation: 4,
+          color: Colors.transparent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Material(
+            borderRadius: BorderRadius.circular(20),
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(20),
+              onTap: ctrl.toggle,
+              child: Obx(() {
+                final expanded = ctrl.isAnimated.value;
+                final showBody = ctrl.showContent.value;
 
-              return AnimatedContainer(
-                duration: const Duration(milliseconds: 500),
-                curve: Curves.easeInOut,
-                width: double.maxFinite,
-                height: expanded ? 300 : 20,
-                child: Stack(
-                  alignment: Alignment.centerLeft,
-                  children: [
-                    // label
-                    AnimatedOpacity(
-                      duration: const Duration(milliseconds: 300),
-                      opacity: expanded ? 0.0 : 1.0,
-                      curve: Curves.easeInOut,
-                      child: label,
-                    ),
+                return AnimatedContainer(
+                  duration: const Duration(milliseconds: 500),
+                  curve: Curves.easeInOut,
+                  width: double.infinity,
+                  height: expanded ? 300 : 40,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withAlpha((0.1 * 255).round()),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Stack(
+                    alignment: Alignment.centerLeft,
+                    children: [
+                      // collapsed label
+                      AnimatedOpacity(
+                        duration: const Duration(milliseconds: 300),
+                        opacity: expanded ? 0 : 1,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 30,
+                            vertical: 12,
+                          ),
+                          child: label,
+                        ),
+                      ),
 
-                    // body content
-                    AnimatedOpacity(
-                      duration: const Duration(milliseconds: 500),
-                      opacity: show ? 1.0 : 0.0,
-                      curve: Curves.easeInOut,
-                      child: body,
-                    ),
-                  ],
-                ),
-              );
-            }),
+                      // expanded body
+                      AnimatedOpacity(
+                        duration: const Duration(milliseconds: 500),
+                        opacity: showBody ? 1 : 0,
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(30, 12, 30, 12),
+                          child: body,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }),
+            ),
           ),
         ),
       ),

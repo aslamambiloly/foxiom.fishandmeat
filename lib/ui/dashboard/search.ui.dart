@@ -9,7 +9,9 @@ import 'package:ecom_one/utils/colors.dart';
 import 'package:ecom_one/utils/shimmer.dart';
 import 'package:ecom_one/widgets/offline.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:shimmer/shimmer.dart';
 
 class SearchActivity extends StatelessWidget {
@@ -21,40 +23,90 @@ class SearchActivity extends StatelessWidget {
     final net = Get.find<NetworkController>();
     final ctrl = Get.put(SearchActivityController());
     final searchBarCtrl = Get.put(AnimatedSearchBarController());
+    final RefreshController refreshCtrl = RefreshController(
+      initialRefresh: false,
+    );
 
-    return Scaffold(
-      body: Stack(
-        children: [
-          topShade(),
-          bottomShade(),
-          Obx(
-            () => AnimatedSwitcher(
-              duration: Duration(milliseconds: 500),
-              switchInCurve: Curves.easeIn,
-              switchOutCurve: Curves.easeOut,
-              child:
-                  !net.isConnected.value
-                      ? OfflineActivity(onTap: net.retry)
-                      : Column(
-                        children: [
-                          SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.08,
+    return SafeArea(
+      child: Scaffold(
+        body: Stack(
+          children: [
+            topShade(),
+            bottomShade(),
+            Obx(
+              () => AnimatedSwitcher(
+                duration: Duration(milliseconds: 500),
+                switchInCurve: Curves.easeIn,
+                switchOutCurve: Curves.easeOut,
+                child:
+                    !net.isConnected.value
+                        ? OfflineActivity(onTap: net.retry)
+                        : SmartRefresher(
+                          controller: refreshCtrl,
+                          header: WaterDropHeader(
+                            waterDropColor: AppColors.secondaryColor,
+                            idleIcon: Icon(
+                              Icons.keyboard_arrow_down_rounded,
+                              size: 20,
+                              color: Colors.white,
+                            ),
+                            refresh: CircularProgressIndicator.adaptive(),
+                            complete: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.check_circle, color: Colors.green),
+                                SizedBox(width: 3),
+                                Text(
+                                  'hoorray!',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontFamily: 'Sora',
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            failed: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.error, color: Colors.red),
+                                SizedBox(width: 8),
+                                Text(
+                                  'Failed',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ],
+                            ),
+                            completeDuration: Duration(seconds: 1),
                           ),
-                          backButton(context),
-                          SizedBox(height: 20),
-                          searchBar(ctrl, searchBarCtrl),
-                          SizedBox(height: 10),
-                          categoryChips(ctrl),
-                          SizedBox(height: 10),
-                          //sortBy(ctrl),
-                          showingResultsCount(ctrl),
-                          resultList2(ctrl),
-                        ],
-                      ),
+                          physics: AlwaysScrollableScrollPhysics(),
+                          onRefresh: () async {
+                            HapticFeedback.selectionClick();
+                            await ctrl.fetchAllProducts();
+                            refreshCtrl.refreshCompleted();
+                            HapticFeedback.lightImpact();
+                          },
+                          child: ListView(
+                            children: [
+                              SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.05,
+                              ),
+                              backButton(context),
+                              SizedBox(height: 20),
+                              searchBar(ctrl, searchBarCtrl),
+                              SizedBox(height: 10),
+                              categoryChips(ctrl),
+                              SizedBox(height: 10),
+                              showingResultsCount(ctrl),
+                              resultList2(ctrl),
+                            ],
+                          ),
+                        ),
+              ),
             ),
-          ),
-          // bottomShade(),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -241,28 +293,7 @@ class SearchActivity extends StatelessWidget {
                 SizedBox(height: 10),
               ],
             ),
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SizedBox(
-                    height: 12,
-                    child: Icon(
-                      Icons.keyboard_arrow_up_rounded,
-                      color: Colors.grey,
-                      size: 15,
-                    ),
-                  ),
-                  Text(
-                    'Submit',
-                    style: TextStyle(fontFamily: 'Sora', fontSize: 8),
-                  ),
-                ],
-              ),
-            ),
+            
           ],
         ),
         label: Row(
@@ -440,66 +471,68 @@ class SearchActivity extends StatelessWidget {
   }
 
   Widget resultList2(SearchActivityController ctrl) {
-    return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
-        child: Obx(() {
-          if (ctrl.isLoading.value) {
-            return GridView.builder(
-              //padding: EdgeInsets.zero,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 10,
-                childAspectRatio: 200 / 170,
-              ),
-              itemCount: 6,
-              itemBuilder: (_, __) => const ProductCardShimmer(),
-            );
-          }
-          final list = ctrl.filteredProducts;
-          if (list.isEmpty) {
-            return const Center(
-              child: Text(
-                'Oops… No items found :(',
-                style: TextStyle(
-                  color: Colors.white70,
-                  fontFamily: 'Sora',
-                  fontSize: 12,
-                ),
-              ),
-            );
-          }
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      child: Obx(() {
+        if (ctrl.isLoading.value) {
           return GridView.builder(
-            padding: EdgeInsets.zero,
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            //padding: EdgeInsets.zero,
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
               crossAxisSpacing: 10,
-              childAspectRatio: 280 / 170,
+              childAspectRatio: 230 / 170,
             ),
-            itemCount: list.length,
-            itemBuilder: (context, i) {
-              final item = list[i];
-              final productId = item['id'] as String;
-              final imageUrl = Uri.encodeFull(
-                'https://fishandmeatapp.onrender.com/uploads/${item['image']}',
-              );
-              return InkWell(
-                borderRadius: BorderRadius.circular(25),
-                onTap: () {
-                  showProductBottomSheet(context, productId);
-                },
-                child: ProductCard(
-                  imageUrl: imageUrl,
-                  title: item['title'] ?? '',
-                  price: item['price'] ?? 0,
-                  stock: item['stock'] ?? 0,
-                  rating: (item['avgRating'] as double?) ?? 0.0,
-                ),
-              );
-            },
+            itemCount: 6,
+            itemBuilder: (_, __) => const ProductCardShimmer(),
           );
-        }),
-      ),
+        }
+        final list = ctrl.filteredProducts;
+        if (list.isEmpty) {
+          return const Center(
+            child: Text(
+              'Oops… No items found :(',
+              style: TextStyle(
+                color: Colors.white70,
+                fontFamily: 'Sora',
+                fontSize: 12,
+              ),
+            ),
+          );
+        }
+        return GridView.builder(
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          padding: EdgeInsets.zero,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 10,
+            childAspectRatio: 230 / 170,
+          ),
+          itemCount: list.length,
+          itemBuilder: (context, i) {
+            final item = list[i];
+            final productId = item['id'] as String;
+            final imageUrl = Uri.encodeFull(
+              'https://fishandmeatapp.onrender.com/uploads/${item['image']}',
+            );
+            return InkWell(
+              borderRadius: BorderRadius.circular(25),
+              onTap: () {
+                showProductBottomSheet(context, productId);
+              },
+              child: ProductCard(
+                imageUrl: imageUrl,
+                title: item['title'] ?? '',
+                price: item['price'] ?? 0,
+                stock: item['stock'] ?? 0,
+                rating: (item['avgRating'] as double?) ?? 0.0,
+              ),
+            );
+          },
+        );
+      }),
     );
   }
 
@@ -716,16 +749,21 @@ class SearchActivity extends StatelessWidget {
       final count = ctrl.filteredProducts.length;
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 4),
-        child: Align(
-          alignment: Alignment.center,
-          child: Text(
-            'Showing $count result${count == 1 ? '' : 's'}',
-            style: TextStyle(
-              color: Colors.white70,
-              fontFamily: 'Sora',
-              fontSize: 12,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(Icons.find_in_page_rounded, size: 14, color: Colors.white70),
+            Text(
+              'Showing $count result${count == 1 ? '' : 's'}',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white70,
+                fontFamily: 'Sora',
+                fontSize: 12,
+              ),
             ),
-          ),
+          ],
         ),
       );
     }),

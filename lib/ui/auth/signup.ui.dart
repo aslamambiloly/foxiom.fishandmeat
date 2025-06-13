@@ -42,7 +42,7 @@ class SignupActivity extends StatelessWidget {
                     () => Icon(
                       Icons.check_circle,
                       color:
-                          controller.isEmailValid.value
+                          controller.isNameValid.value
                               ? Colors.white
                               : Colors.grey[600],
                       size: 12,
@@ -115,7 +115,7 @@ class SignupActivity extends StatelessWidget {
                           () => Icon(
                             Icons.check_circle,
                             color:
-                                controller.isEmailValid.value
+                                controller.isPhoneValid.value
                                     ? Colors.white
                                     : Colors.grey[600],
                             size: 12,
@@ -134,6 +134,7 @@ class SignupActivity extends StatelessWidget {
                 children: [
                   Expanded(
                     child: darkLightButton('LOGIN', () {
+                      FocusScope.of(context).unfocus();
                       signupRotatorKey.currentState?.toggleRotate();
                       controller.navigateLogin(context);
                     }),
@@ -143,12 +144,15 @@ class SignupActivity extends StatelessWidget {
                   const SizedBox(width: 15),
                   Expanded(
                     child: ekdhamDarkYellowButton('SIGNUP', () {
-                      controller.validateCredentialsAndSignup(context);
-                      if (controller.isLoading.value) {
-                        signupRotatorKey.currentState?.rotateOn();
-                      } else {
-                        signupRotatorKey.currentState?.rotateOff();
-                      }
+                      FocusScope.of(context).unfocus();
+                      controller.validateCredentialsAndSignup(
+                        context,
+                        onSuccess: () {
+                          Future.delayed(Duration(milliseconds: 100), () {
+                            signupRotatorKey.currentState?.toggleRotate();
+                          });
+                        },
+                      );
                     }),
                   ),
                 ],
@@ -170,3 +174,4 @@ class SignupActivity extends StatelessWidget {
     );
   }
 }
+

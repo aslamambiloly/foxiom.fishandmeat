@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class AnimatedIconButton extends StatefulWidget {
   final Column body;
@@ -64,7 +65,10 @@ class _AnimatedIconButtonState extends State<AnimatedIconButton> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
       child: InkWell(
         borderRadius: BorderRadius.circular(25),
-        onTap: toggleCard,
+        onTap: () {
+          HapticFeedback.lightImpact();
+          toggleCard();
+        },
         child: AnimatedContainer(
           duration: Duration(seconds: 1),
           curve: Curves.fastOutSlowIn,

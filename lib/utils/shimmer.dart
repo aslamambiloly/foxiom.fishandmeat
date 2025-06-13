@@ -8,6 +8,7 @@ class ProductCardShimmer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(25)),
+      height: 148,
       width: 140,
       margin: EdgeInsets.only(right: 12),
       child: Shimmer.fromColors(
@@ -15,9 +16,10 @@ class ProductCardShimmer extends StatelessWidget {
         highlightColor: Colors.grey[700]!,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Container(
-              height: 110,
+              height: 80,
               decoration: BoxDecoration(
                 color: Colors.grey[800],
                 borderRadius: BorderRadius.circular(15),
@@ -32,15 +34,7 @@ class ProductCardShimmer extends StatelessWidget {
                 borderRadius: BorderRadius.circular(15),
               ),
             ),
-            SizedBox(height: 6),
-            Container(
-              height: 12,
-              width: 40,
-              decoration: BoxDecoration(
-                color: Colors.grey[800],
-                borderRadius: BorderRadius.circular(15),
-              ),
-            ),
+            
           ],
         ),
       ),

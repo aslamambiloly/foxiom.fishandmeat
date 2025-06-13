@@ -14,6 +14,7 @@ import 'package:ecom_one/utils/shimmer.categories.dart';
 import 'package:ecom_one/utils/widgets.dart';
 import 'package:ecom_one/widgets/offline.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
@@ -30,6 +31,11 @@ class HomeActivity extends StatelessWidget {
     );
     final TodaysPicksController productsCtrl = Get.put(TodaysPicksController());
     final reloadKey = 0.obs;
+    final mdqry = MediaQuery.of(context);
+    //final screenHt = mdqry.size.height;
+    final screenWt = mdqry.size.width;
+
+
 
     return SafeArea(
       child: Scaffold(
@@ -81,19 +87,20 @@ class HomeActivity extends StatelessWidget {
                       ),
                       physics: AlwaysScrollableScrollPhysics(),
                       onRefresh: () async {
+                        HapticFeedback.selectionClick();
                         await controller.refreshData();
                         reloadKey.value++;
                         refreshCtrl.refreshCompleted();
+                        HapticFeedback.lightImpact();
+
                       },
+                      
                       child: ListView(
                         physics: AlwaysScrollableScrollPhysics(),
-
+      
                         children: [
-                          SizedBox(
-                            height:
-                                MediaQuery.of(context).size.height * 13 / 100,
-                          ),
-
+                          SizedBox(height: screenWt * 0.28),
+      
                           greetingSearchBar(controller, context),
                           SizedBox(height: 10),
                           carousel(controller, context),
@@ -238,63 +245,55 @@ class HomeActivity extends StatelessWidget {
         child: Material(
           color: Colors.transparent,
           borderRadius: BorderRadius.circular(25),
-          child: SizedBox(
-            width: MediaQuery.of(context).size.width * 100 / 100,
-            height: MediaQuery.of(context).size.width * 135 / 100,
-            child: Padding(
-              padding: EdgeInsets.all(20),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      BlurredBubbleChildable(
-                        child: RichText(
-                          text: TextSpan(
-                            style: TextStyle(
-                              fontFamily: 'Sora-SemiBold',
-                              fontSize: 12,
-                              color: Colors.white,
-                            ),
-                            children: [
-                              TextSpan(
-                                text: 'Order',
-                                style: TextStyle(
-                                  color: AppColors.primaryColour,
-                                ),
-                              ),
-                              TextSpan(text: ' Between'),
-                            ],
+          child: Padding(
+            padding: EdgeInsets.all(20),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    BlurredBubbleChildable(
+                      child: RichText(
+                        text: TextSpan(
+                          style: TextStyle(
+                            fontFamily: 'Sora-SemiBold',
+                            fontSize: 12,
+                            color: Colors.white,
                           ),
+                          children: [
+                            TextSpan(
+                              text: 'Order',
+                              style: TextStyle(color: AppColors.primaryColour),
+                            ),
+                            TextSpan(text: ' Between'),
+                          ],
                         ),
                       ),
-                      Text('&', style: TextStyle(fontFamily: 'Sora-SemiBold')),
-                      BlurredBubbleChildable(
-                        child: RichText(
-                          text: TextSpan(
-                            style: TextStyle(
-                              fontFamily: 'Sora-SemiBold',
-                              fontSize: 12,
-                              color: Colors.white,
-                            ),
-                            children: [
-                              TextSpan(
-                                text: 'Get',
-                                style: TextStyle(
-                                  color: AppColors.primaryColour,
-                                ),
-                              ),
-                              TextSpan(text: ' Between'),
-                            ],
+                    ),
+                    Text('&', style: TextStyle(fontFamily: 'Sora-SemiBold')),
+                    BlurredBubbleChildable(
+                      child: RichText(
+                        text: TextSpan(
+                          style: TextStyle(
+                            fontFamily: 'Sora-SemiBold',
+                            fontSize: 12,
+                            color: Colors.white,
                           ),
+                          children: [
+                            TextSpan(
+                              text: 'Get',
+                              style: TextStyle(color: AppColors.primaryColour),
+                            ),
+                            TextSpan(text: ' Between'),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
-                  children,
-                ],
-              ),
+                    ),
+                  ],
+                ),
+                children,
+              ],
             ),
           ),
         ),
@@ -456,7 +455,7 @@ class HomeActivity extends StatelessWidget {
                       text: TextSpan(
                         style: TextStyle(
                           fontFamily: 'Sora',
-                          fontSize: 12,
+                          fontSize: 10,
                           color: Colors.white,
                         ),
                         children: [
@@ -489,7 +488,7 @@ class HomeActivity extends StatelessWidget {
                     text: const TextSpan(
                       style: TextStyle(
                         fontFamily: 'Sora',
-                        fontSize: 12,
+                        fontSize: 10,
                         color: Colors.white,
                       ),
                       children: [
@@ -542,35 +541,39 @@ class HomeActivity extends StatelessWidget {
                       color: AppColors.primaryColour,
                     ),
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'and get yours between',
-                        style: TextStyle(fontFamily: 'Sora', fontSize: 12),
-                      ),
-                      SizedBox(width: 5),
-                      BlurredBubble(
-                        text: controller.time1.value,
-                        textStyle: TextStyle(
-                          fontFamily: 'Sora-Bold',
-                          fontSize: 12,
+                  Flexible(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'and get yours between',
+                          style: TextStyle(fontFamily: 'Sora', fontSize: 12),
                         ),
-                      ),
-                      SizedBox(width: 5),
-                      Text(
-                        '&',
-                        style: TextStyle(fontFamily: 'Sora', fontSize: 12),
-                      ),
-                      SizedBox(width: 5),
-                      BlurredBubble(
-                        text: controller.time2.value,
-                        textStyle: TextStyle(
-                          fontFamily: 'Sora-Bold',
-                          fontSize: 12,
+                        SizedBox(width: 5),
+                        BlurredBubble(
+                          text: controller.time1.value,
+                          textStyle: TextStyle(
+                            fontFamily: 'Sora-Bold',
+                            fontSize: 12,
+                          ),
                         ),
-                      ),
-                    ],
+                        SizedBox(width: 5),
+                        Text(
+                          '&',
+                          style: TextStyle(fontFamily: 'Sora', fontSize: 12),
+                        ),
+                        SizedBox(width: 5),
+                        Flexible(
+                          child: BlurredBubble(
+                            text: controller.time2.value,
+                            textStyle: TextStyle(
+                              fontFamily: 'Sora-Bold',
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               );
@@ -635,7 +638,7 @@ class HomeActivity extends StatelessWidget {
                   overflow: TextOverflow.fade,
                   textAlign: TextAlign.center,
                   text: const TextSpan(
-                    style: TextStyle(fontSize: 12, color: Colors.white),
+                    style: TextStyle(fontSize: 10, color: Colors.white),
                     children: [
                       TextSpan(
                         text: 'Your',
@@ -708,7 +711,14 @@ class HomeActivity extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(title, style: TextStyle(fontFamily: 'Sora-Bold', fontSize: 14)),
+          Text(
+            title,
+            style: TextStyle(
+              fontFamily: 'Sora-Bold',
+              fontSize: 14,
+              color: Colors.grey,
+            ),
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             mainAxisSize: MainAxisSize.min,
@@ -721,12 +731,20 @@ class HomeActivity extends StatelessWidget {
                   ),
                   child: Text(
                     more,
-                    style: TextStyle(fontFamily: 'Sora', fontSize: 10),
+                    style: TextStyle(
+                      fontFamily: 'Sora',
+                      fontSize: 10,
+                      color: Colors.grey,
+                    ),
                   ),
                 ),
               ),
               SizedBox(width: 5),
-              Icon(Icons.arrow_forward_ios_rounded, size: 10),
+              Icon(
+                Icons.arrow_forward_ios_rounded,
+                size: 8,
+                color: Colors.grey,
+              ),
             ],
           ),
         ],

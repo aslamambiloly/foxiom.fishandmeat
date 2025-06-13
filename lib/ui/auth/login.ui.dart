@@ -34,7 +34,10 @@ class LoginActivity extends StatelessWidget {
                 autocorrect: true,
                 cursorColor: Colors.white,
                 keyboardType: TextInputType.emailAddress,
-                style: const TextStyle(fontSize: 12, fontFamily: 'Sora'),
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontFamily: 'Sora-SemiBold',
+                ),
                 controller: controller.email,
                 decoration: InputDecoration(
                   suffixIcon: Obx(
@@ -57,6 +60,7 @@ class LoginActivity extends StatelessWidget {
                 children: [
                   Expanded(
                     child: darkLightButton('SIGNUP', () {
+                      FocusScope.of(context).unfocus();
                       loginRotatorKey.currentState?.toggleRotate();
                       controller.navigateSignup(context);
                     }),
@@ -66,6 +70,7 @@ class LoginActivity extends StatelessWidget {
                   const SizedBox(width: 15),
                   Expanded(
                     child: ekdhamDarkYellowButton('LOGIN', () {
+                      FocusScope.of(context).unfocus();
                       controller.attemptLogin(context);
                       if (controller.isLoading.value) {
                         loginRotatorKey.currentState?.rotateOn();
